@@ -13,10 +13,11 @@
   "license": "MIT",
   "devDependencies": {
     "@types/common-tags": "^1.8.4",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "tsx": "^4.10.4"
   },
   "dependencies": {
     "@opensouls/engine": "^0.1.4",
-    "express": "*"
+    "express": "^4.19.2"
   }
 }

@@ -41,7 +41,7 @@ but the model of the person and the conversation is not explicitly in memory */
 const learnsAboutTheUser: MentalProcess = async ({ workingMemory }) => {
   // create a hook that persists the model of the user
   const userModel = useProcessMemory("Unkown User")
-  const { log } = useActions()
+  const { log, dispatch } = useActions()
 
   // remember the model of the user
   const mem = workingMemory.withMonologue(
@@ -55,24 +55,30 @@ const learnsAboutTheUser: MentalProcess = async ({ workingMemory }) => {
   )
 
   // reflect on the message from the user and what it says about them
-  const [withLearnings, learnings] = await internalMonologue(mem, "What have I learned specifically about the user from the last message?", { model: "quality" })
+  const [withLearnings, learnings] = await internalMonologue(mem, "What have I learned specifically about the user from the last message?", { model: "gpt-4o" })
   log("Learnings:", learnings)
 
   // use that reflection to help update the user model
-  const [, notes] = await userNotes(withLearnings, undefined, { model: "quality"})
+  const [, notes] = await userNotes(withLearnings, undefined, { model: "gpt-4o" })
   log("Notes:", notes)
   userModel.current = notes
 
   // generate feedback to the soul for how its behavior should change
-  const [,thought] = await internalMonologue(
-    mem, 
+  const [, thought] = await internalMonologue(
+    mem,
     {
-      instructions: "Reflect on the recent learnings about the user and my behavior", 
+      instructions: "Reflect on the recent learnings about the user and my behavior",
       verb: "thinks",
     },
-    { model: "quality" }
+    { model: "gpt-4o" }
   );
   log("Thought:", thought)
+
+  dispatch({
+    name: workingMemory.soulName,
+    action: "thinks",
+    content: thought
+  });
 
   // add the feedback to the initial working memory
   return workingMemory.withMonologue(`${mem.soulName} thinks to themself: ${thought}`)
