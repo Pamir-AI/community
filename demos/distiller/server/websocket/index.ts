@@ -24,11 +24,24 @@ async function connectToSoulEngine() {
 
   soul.on("says", async (event: any) => {
     const content = await event.content();
+    const message = JSON.stringify({ type: "says", content });
     // Broadcast message to all connected WebSocket clients
     wss.clients.forEach((client: WebSocket) => {
       if (client.readyState === WebSocket.OPEN) {
-        console.log(`Broadcasting message: ${content}`);
-        client.send(content);
+        console.log(`Broadcasting message: ${message}`);
+        client.send(message);
+      }
+    });
+  });
+  
+soul.on("thinks", async (event: any) => {
+    const content = await event.content();
+    const message = JSON.stringify({ type: "thinks", content });
+    // Broadcast message to all connected WebSocket clients
+    wss.clients.forEach((client: WebSocket) => {
+      if (client.readyState === WebSocket.OPEN) {
+        console.log(`Broadcasting thoughts: ${message}`);
+        client.send(message);
       }
     });
   });
